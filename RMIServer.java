@@ -72,9 +72,10 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
         }
 
         @Override
-        public boolean bid(float bid, int client_no, int item_id) throws RemoteException{
+        public float bid(float bid, int client_no, int item_id) throws RemoteException{
 
             // DefaultSystemTime time = new DefaultSystemTime();
+            float max_bid = 0;
             try{
             ClockInterface cs = (ClockInterface) Naming.lookup("ClockServer");
             ClockMessage taggedTime = cs.getTaggedTime();
@@ -121,7 +122,7 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
             while(token.getOwner()!=serverNo);
             System.out.println("Lock Acquired");
             critical = true;
-            critical_section(bid, client_no, bid_time, item_id);
+            max_bid = critical_section(bid, client_no, bid_time, item_id);
             critical = false;
             releaseToken();
             System.out.println("Lock Released\n");
@@ -139,7 +140,7 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
         //complete CR, release() and send to next in queue, else wait.
 
         //recieve_request -> add to queuue 
-        return true;     
+        return max_bid;     
     }
 
     public void sendRequest() throws RemoteException{
@@ -155,7 +156,7 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
         }
     }
 
-    public void critical_section(float bid, int client_no, long bid_time, int item_id) throws RemoteException{
+    public float critical_section(float bid, int client_no, long bid_time, int item_id) throws RemoteException{
         // System.out.println("hello " + bid);
         float max_bid = 0;
         float id = 0;
@@ -204,6 +205,7 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
             System.out.println("Previous maximum bid - " + max_bid);
         }
         if(max_bid<bid){
+                max_bid = bid;
                 try{
 
                     BufferedWriter outputWriter = new BufferedWriter(new FileWriter("bid" +item_id+".txt"));
@@ -237,6 +239,7 @@ public class RMIServer extends UnicastRemoteObject implements MyInterface
         catch(Exception e){
             System.out.println("Failed to write to transaction file " + e);
         }
+        return max_bid;
     }
 
     public void recieveRequest(int i, int n) throws RemoteException{

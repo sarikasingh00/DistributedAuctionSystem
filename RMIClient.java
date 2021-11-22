@@ -105,7 +105,8 @@ public class RMIClient
                 if(auction_ch==1){
                     System.out.println("\nEnter item ID to bid for -");
                     int item_ch = Integer.parseInt(br.readLine());
-                    boolean flag = true;
+                    // boolean flag = true;
+                    float max_bid = 0;
                     Date now = new Date();
                     endTime = endTimeList.get(item_ch);
                     // System.out.println(now);
@@ -124,7 +125,8 @@ public class RMIClient
                             System.out.println("Exception occurred : "+ e);
                         }
                         // MyInterface server= (MyInterface) Naming.lookup(path);
-                        flag = server.bid(input, client_no, item_ch);
+                        max_bid = server.bid(input, client_no, item_ch);
+                        System.out.println("Current Maximum bid for item - " + max_bid);
                         now = new Date();
                     }
                     

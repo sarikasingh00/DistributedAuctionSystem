@@ -27,8 +27,10 @@ public class ClockServer extends UnicastRemoteObject implements ClockInterface{
 
     //return a pair of timed Values, when the message was received and when it was sent (time in milliseconds since January 1, 1970)
     public ClockMessage getTaggedTime() throws RemoteException{
+        System.out.println("Request recieved for tagged time");
         long in = clientClock.instant().toEpochMilli();
         long time = clientClock.instant().toEpochMilli();
+        System.out.println("In time - " + in + " Clock Server Time - " + time);
         return new ClockMessage(in,time,clientClock.instant().toEpochMilli());
     }
 
